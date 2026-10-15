@@ -35,13 +35,13 @@ public sealed class CountingSheep : ModdedModule
 
     private Coroutine _wakeRoutine;
 
+    private Coroutine _stuckRoutine;
+
     private bool _hasBeenValidated;
 
     private static AudioLowPassFilter s_filterLowPass;
 
     private static AudioReverbFilter s_filterReverb;
-
-    private bool _configuredAudioEffect;
 
     private bool _hardReset;
 
@@ -88,25 +88,23 @@ public sealed class CountingSheep : ModdedModule
 
     private void ConfigureAudioEffect()
     {
-        if (_configuredAudioEffect)
-            return;
-
-        _configuredAudioEffect = true;
-
-        var listener = FindObjectsOfType<AudioListener>().Select(x => x.gameObject).FirstOrDefault(x => x.activeInHierarchy);
-        if (listener)
+        if (!s_filterLowPass || !s_filterReverb)
         {
-            if (!s_filterLowPass)
+            var listener = FindObjectsOfType<AudioListener>().Select(x => x.gameObject).FirstOrDefault(x => x.activeInHierarchy);
+            if (listener)
             {
-                s_filterLowPass = listener.AddComponent<AudioLowPassFilter>();
-                s_filterLowPass.cutoffFrequency = 22000f;
-            }
+                if (!s_filterLowPass)
+                {
+                    s_filterLowPass = listener.AddComponent<AudioLowPassFilter>();
+                    s_filterLowPass.cutoffFrequency = 22000f;
+                }
 
-            if (!s_filterReverb)
-            {
-                s_filterReverb = listener.AddComponent<AudioReverbFilter>();
-                s_filterReverb.room = -10000f;
-                s_filterReverb.reverbDelay = 0.1f;
+                if (!s_filterReverb)
+                {
+                    s_filterReverb = listener.AddComponent<AudioReverbFilter>();
+                    s_filterReverb.room = -10000f;
+                    s_filterReverb.reverbDelay = 0.1f;
+                }
             }
         }
     }
@@ -121,6 +119,10 @@ public sealed class CountingSheep : ModdedModule
 
         if (_engageRoutine != null)
             StopCoroutine(_engageRoutine);
+
+        if (_stuckRoutine != null)
+            StopCoroutine(_stuckRoutine);
+
         _engageRoutine = StartCoroutine(EngageLoop());
     }
 
@@ -152,7 +154,7 @@ public sealed class CountingSheep : ModdedModule
     {
         if (!IsValidModule)
         {
-            StartCoroutine(StuckLoop());
+            _stuckRoutine = StartCoroutine(StuckLoop());
             while (true)
             {
                 var target = Mathf.FloorToInt(Random.Range(10f, 98f)) + 0.25f;
