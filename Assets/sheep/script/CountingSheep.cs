@@ -155,7 +155,7 @@ public sealed class CountingSheep : ModdedModule
             StartCoroutine(StuckLoop());
             while (true)
             {
-                var target = Mathf.FloorToInt(Random.Range(100f, 998f)) + 0.25f;
+                var target = Mathf.FloorToInt(Random.Range(10f, 98f)) + 0.25f;
                 _module.SetNeedyTimeRemaining(target);
                 yield return new WaitForSeconds(Random.Range(0.1f, 0.5f));
             }
