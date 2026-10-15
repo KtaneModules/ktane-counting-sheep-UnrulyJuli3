@@ -216,9 +216,9 @@ public sealed class CountingSheep : ModdedModule
 
         AudioListener.volume = Mathf.Lerp(1f, 0f, Mathf.InverseLerp(0.9f, 1f, progress));
         if (s_filterLowPass)
-            s_filterLowPass.cutoffFrequency = Mathf.Lerp(22000f, 1000f, Mathf.InverseLerp(0.7f, 0.97f, progress));
+            s_filterLowPass.cutoffFrequency = Mathf.Lerp(22000f, 1000f, Mathf.InverseLerp(0.5f, 0.9f, progress));
         if (s_filterReverb)
-            s_filterReverb.room = Mathf.Lerp(-10000f, 0f, Mathf.InverseLerp(0.7f, 0.95f, progress));
+            s_filterReverb.room = Mathf.Lerp(-10000f, 0f, Mathf.InverseLerp(0.5f, 0.8f, progress));
     }
 
     private void OnTimerExpired()
